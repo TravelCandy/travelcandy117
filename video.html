@@ -44,10 +44,10 @@
 
     .video-box {
       background: #000;
-      padding: 0;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      min-height: 250px;
     }
 
     iframe {
@@ -59,14 +59,18 @@
 
     #status {
       color: #fff;
-      padding: 60px 20px;
-      font-size: 16px;
+      padding: 80px 20px;
+      font-size: 17px;
     }
 
     .note {
       margin-top: 25px;
       font-size: 15px;
       color: #666;
+    }
+
+    .error {
+      color: #ffdddd;
     }
   </style>
 </head>
@@ -100,10 +104,18 @@
 
   </div>
 
+
   <script>
 
+    /* Cloudflare Worker */
     const WORKER_URL =
       "https://steep-bird-df4f.bv117verma.workers.dev/video";
+
+
+    /* Cloudflare Stream Video ID */
+    const VIDEO_ID =
+      "86b22c1803e641568d335691d0271397";
+
 
     async function loadVideo() {
 
@@ -115,20 +127,32 @@
         const response = await fetch(WORKER_URL);
 
         if (!response.ok) {
-          throw new Error("Worker request failed");
+          throw new Error("Worker request failed: " + response.status);
         }
 
         const data = await response.json();
+
+        console.log("Worker response:", data);
+
 
         if (!data.success || !data.token) {
           throw new Error("Video token not received");
         }
 
+
+        /*
+          Cloudflare Stream secure player
+          Token is passed as ?token=
+        */
+
         const iframe = document.createElement("iframe");
 
         iframe.src =
           "https://iframe.videodelivery.net/" +
-          data.token;
+          VIDEO_ID +
+          "?token=" +
+          encodeURIComponent(data.token);
+
 
         iframe.allow =
           "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
@@ -139,16 +163,21 @@
 
         status.remove();
 
+
       } catch (error) {
 
-        console.error(error);
+        console.error("Video Error:", error);
 
-        status.textContent =
-          "Video load nahi ho pa raha. Please page refresh karke dobara try karein.";
+        status.classList.add("error");
+
+        status.innerHTML =
+          "Video load nahi ho pa raha.<br><br>" +
+          "Please page refresh karke dobara try karein.";
 
       }
 
     }
+
 
     loadVideo();
 
