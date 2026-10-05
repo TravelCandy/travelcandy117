@@ -44,10 +44,10 @@
 
     .video-box {
       background: #000;
-      padding: 0;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      min-height: 250px;
     }
 
     iframe {
@@ -59,8 +59,8 @@
 
     #status {
       color: #fff;
-      padding: 60px 20px;
-      font-size: 16px;
+      padding: 70px 20px;
+      font-size: 17px;
       background: #000;
     }
 
@@ -123,6 +123,16 @@
 
         console.log("Worker response:", data);
 
+        /*
+          Worker response:
+          {
+            success: true,
+            token: {
+              token: "SIGNED_TOKEN"
+            }
+          }
+        */
+
         if (
           !data.success ||
           !data.token ||
@@ -131,11 +141,16 @@
           throw new Error("Video token not received");
         }
 
+        const signedToken = data.token.token;
+
         const iframe = document.createElement("iframe");
 
+        /*
+          Cloudflare Stream signed-token player
+        */
         iframe.src =
           "https://iframe.videodelivery.net/" +
-          data.token.token;
+          signedToken;
 
         iframe.allow =
           "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
@@ -148,10 +163,11 @@
 
       } catch (error) {
 
-        console.error("Video error:", error);
+        console.error("Video Error:", error);
 
-        status.textContent =
-          "Video load nahi ho pa raha. Please page refresh karke dobara try karein.";
+        status.innerHTML =
+          "Video load nahi ho pa raha.<br><br>" +
+          "Please page refresh karke dobara try karein.";
 
       }
 
