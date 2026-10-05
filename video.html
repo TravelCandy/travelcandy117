@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Travel Candy | Video Guide</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -69,7 +76,9 @@
       font-size: 15px;
       color: #666;
     }
+
   </style>
+
 </head>
 
 <body>
@@ -101,69 +110,100 @@
 
   </div>
 
+
   <script>
 
     const WORKER_URL =
       "https://steep-bird-df4f.bv117verma.workers.dev/video";
 
+
     async function loadVideo() {
 
-      const status = document.getElementById("status");
-      const player = document.getElementById("player");
+      const status =
+        document.getElementById("status");
+
+      const player =
+        document.getElementById("player");
+
 
       try {
 
-        const response = await fetch(WORKER_URL);
+        const response =
+          await fetch(WORKER_URL);
+
 
         if (!response.ok) {
-          throw new Error("Worker request failed");
+
+          throw new Error(
+            "Worker request failed"
+          );
+
         }
 
-        const data = await response.json();
 
-        console.log("Worker response:", data);
+        const data =
+          await response.json();
 
-        /*
-          Worker response:
-          {
-            success: true,
-            token: {
-              token: "SIGNED_TOKEN"
-            }
-          }
-        */
+
+        console.log(
+          "Worker response:",
+          data
+        );
+
+
+        // Worker returns:
+        // {
+        //   success: true,
+        //   token: "SIGNED_TOKEN"
+        // }
 
         if (
           !data.success ||
-          !data.token ||
-          !data.token.token
+          !data.token
         ) {
-          throw new Error("Video token not received");
+
+          throw new Error(
+            "Video token not received"
+          );
+
         }
 
-        const signedToken = data.token.token;
 
-        const iframe = document.createElement("iframe");
+        const signedToken =
+          data.token;
 
-        /*
-          Cloudflare Stream signed-token player
-        */
+
+        const iframe =
+          document.createElement("iframe");
+
+
         iframe.src =
           "https://iframe.videodelivery.net/" +
           signedToken;
 
+
         iframe.allow =
           "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture";
 
+
         iframe.allowFullscreen = true;
 
-        player.appendChild(iframe);
+
+        player.appendChild(
+          iframe
+        );
+
 
         status.remove();
 
+
       } catch (error) {
 
-        console.error("Video Error:", error);
+        console.error(
+          "Video Error:",
+          error
+        );
+
 
         status.innerHTML =
           "Video load nahi ho pa raha.<br><br>" +
@@ -173,9 +213,11 @@
 
     }
 
+
     loadVideo();
 
   </script>
 
 </body>
+
 </html>
